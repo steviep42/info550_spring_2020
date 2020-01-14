@@ -6,16 +6,15 @@ Places like The Internet Movie Database use to have free data out there but sinc
 
 ## Application Programming Interface ? 
 
-Some of these services offer Application Programming Interfaces (APIs) as well as built in visualization tools that can be helpful as good starting points for how one might present the data graphically. There is web site called The Programmable Web http://www.programmableweb.com/ that maintains a list of all data providers who offer an API. This is useful for identifying websites that allow you to programmatically access their data. They usually require some type of sign up or registration prior to use. Some of them might not be free but many are. Usually if they are free they will limit you to a specific number of access in a given time frame. 
+Some of these services offer Application Programming Interfaces (APIs) as well as built in visualization tools that can be helpful as good starting points for how one might present the data graphically. APIs have become so common and popular that some information providers have begun to charge for their services usually in the form of teired subscription services. Most will offer a free tier which is limited in some way. As an exmample, Google geocoding services used to be free but have ceased to be. 
 
 ## Formats ?
+
 Lastly, keep in mind that not all of these sites offer so called "Big Datasets" but many do. Some of these require that you navigate to a specific section of the site to obtain raw or .CSV files. It might also be that the sites offer only a specific format such as XML or JSON in which case you will have to parse that information. We'll be looking at how to do that for some data formats later in the class. As an example of formats that are hard to parse the Million Song Database is provided in an HD5 format which can be parsed but not so easily. Amazon has offered space to host the entire 300GB dataset in a but it's too large for most people to download conveniently. Of course Amazon wants you to use their compute resources to analyze this data which is why they offer it for free. There is a subset of the MSD at http://labrosa.ee.columbia.edu/millionsong/pages/getting-dataset
 
 ## Various Links
 
 The list below is current to the best of my knowledge. That is all the links work as of this writing unless I've made a typo which is entirely possible. The list of interesting data grows all the time so just pick a domain of interest and Google it like "DNA Sequencing open data set" and I guarantee you that something interesting will turn up. Also when perusing these sites if you find one of interest also search it to see if it offers an API which would simplify access. Sites are infamous for providing API access only to later revoke it usually because too many people use it. Or worse, they start charging lots of money for people to use it. 
-
-
 
 
 |Description | Link|
