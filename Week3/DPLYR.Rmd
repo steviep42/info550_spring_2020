@@ -25,6 +25,9 @@ library(xaringanthemer)
 
 ```
 
+## Courtsey Of Chuck Lanfear at The University of Washington
+
+---
 
 # Death to Spreadsheets
 
