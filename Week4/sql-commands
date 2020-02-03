@@ -1,0 +1,270 @@
+https://raw.githubusercontent.com/pittardsp/info550_spring_2018/master/SUPPORT/iris.csv
+
+sqlite3 iris.db 
+
+create table iris (sepal_length numeric(5,1),
+    sepal_width numeric(5,1),
+    petal_length numeric(5,1),
+    petal_width numeric(5,1),
+    species varchar(10));
+    
+    
+.schema    
+
+.header on
+.mode csv
+.import iris.csv iris 
+
+select count(*) from iris;
+
+select count(*) as total_iris from iris;
+
+.header off
+
+select count(*) from iris where species = "versicolor";
+
+select species, sepal_length from iris 
+        where sepal_length >= 7.8;
+        
+ 
+SELECT * FROM iris WHERE species = 'setosa' LIMIT 5;
+
+SELECT * FROM iris WHERE species = 'setosa' AND  sepal_width >  4.0;
+
+# Gets all setosa or versicolor records whose sepal_width is greater than  3.3. Display only 5 records.
+
+SELECT * FROM iris WHERE (species = 'setosa' OR species = 'versicolor') AND sepal_width >  3.3 LIMIT 5;
+
+
+#Gets species, sepal_width, sepal_length where sepal_width is greater than 3.5 
+#Result is then ordered by species alphabetically.
+
+SELECT species, sepal_width, sepal_length from iris where sepal_width >  3.5 ORDER BY species;
+
+# Use the Like operator
+   
+ select * from iris where species like '%osa%' limit 1;
+
+# Aggregation
+
+select avg(sepal_length), avg(sepal_width) from iris;
+
+select round(avg(sepal_length),2), round(avg(sepal_width),2) from iris;
+
+select round(avg(sepal_length),2),round(avg(sepal_width),2)  from iris group by species;
+
+select round(avg(sepal_length),2),round(avg(sepal_width),2) from iris group by species;
+       
+# Get the species name
+ select species, round(avg(sepal_length),2), round(avg(sepal_width),2)  from iris group by species;
+
+
+#Let's say that we want the average sepal width for each of the three species but only for all # records wherein the sepal length is > 2.8
+
+ select species,avg(sepal_width) from iris where sepal_width > 2.8 group by species;
+
+select species,round(avg(sepal_width),2) from iris where sepal_width > 2.8 group by species;
+
+.headers on
+
+select species,avg(sepal_length) from iris;
+
+select species,avg(sepal_length) as mean_sepal_length from iris;
+
+select species as Iris_Species,avg(sepal_length) as mean_sepal_length from iris;
+
+#Let's say that we want the average sepal width for each of the three species 
+# but only where the average for the respective group exceeds 2.8. 
+
+select species,avg(sepal_width) from iris where avg(sepal_width) > 2.8;
+
+# That didn't work but we aren't sure why. Let's try to use "as"
+
+select species, avg(sepal_width) as mean from iris where mean > 2.8;
+
+# We need to extend our knowledge of SQL to solve this problem
+
+ select species, round(avg(sepal_width),2) as mean from iris group by species HAVING mean > 2.8;
+
+select species, round(avg(sepal_width),2) as mean from iris group by species;
+
+# Let's sort the result by the mean in ascending order
+select species, round(avg(sepal_width),2) as mean
+        from iris group by species order by mean asc;
+        
+ 
+# We can also insert new records into the database. Usually this is done from a program or script # which loads many records at once. However, you can load records one at a time if you wish. 
+
+ insert into iris values (5.1,3.5,1.4,0.2,"setosa");
+insert into iris values (4.9,3.5,1.4,0.2,"setosa");
+
+
+# We can also update or delete existing records based on some condition. An example:
+
+delete from iris where species = 'versicolor';
+select count(*) from iris where species = 'versicolor';
+
+# Access From R
+
+library(DBI)
+con <- dbConnect(RSQLite::SQLite(),dbname="iris.db")
+dbListTables(con)
+
+(res <- dbGetQuery(con, "select count(*) from iris"))
+
+(res <- dbGetQuery(con, "select * from iris where sepal_length > 3.0 limit 5"))
+
+# sqldf
+
+library(sqldf)
+data(mpg, package = "ggplot2")
+sqldf("select * from mpg where hwy > 35 and cty > 20")
+
+# similarities to dplyr
+
+#Note that the above is equivalent to the following which is how one would usually do this within # R. The advantage of using the SQL approach is that it generalizes outside of R.
+
+library(dplyr)
+mpg %>% filter(hwy > 35 & cty > 20)
+
+
+# Behind the scenes the sqldf package creates an SQLite version of the data. If you are working with
+# an existing multi-table database then you should use the DBI approach described 
+# above because it performs better.
+
+# How many cars have a manual transmission ?
+
+sqldf("select count(*) from mpg where trans like '%man%'")
+
+# Here is an equivalent R expression 
+
+mpg %>% filter(grepl("manual",trans)) %>% nrow()
+
+# Find the average city MPG by manufacturer. Sort it from highest to lowest
+
+sqldf("select manufacturer,avg(cty) as mean from mpg 
+         group by manufacturer order by mean desc");
+         
+         
+mpg %>% group_by(manufacturer) %>% summarize(mean=mean(cty)) %>%
+   arrange(desc(mean))
+
+# restaurants.db
+https://github.com/pittardsp/info550_spring_2018/blob/master/SUPPORT/restaurants.db
+
+sqlite3 restaurants.db 
+
+.tables
+
+.schema
+
+select count(score) as 'number_of_inspections' from inspections;
+
+select count(score) as score70 from inspections where score < 70;
+
+select count(score) as score80 from inspections where score < 80;
+
+# Okay well WHO has the LOWEST numeric score overall ? 
+ select name, score from businesses, inspections
+       where businesses.business_id = inspections.business_id
+       order by score limit 15;
+
+# how many violations exist for each restaurant ? 
+
+ select name, count(violationid) from businesses, violations
+        where businesses.business_id = violations.business_id 
+        group by name limit 15;
+        
+ # Well that wasn't sorted. I want to know the place with the most violations
+
+select name, count(violationid) as volcnt from businesses, violations
+        where businesses.business_id = violations.business_id
+        group by name order by volcnt desc limit 15;
+        
+# Wait a minute. So was it one Starbuck's location that got 327 violations ? 
+# Probably not. There are multiple Starbucks. How could we find out ? 
+
+#The DISTINCT function in SQL will show us how many distinct business ids there are associated # with any business containing ``STARBUCK'' in the name.
+
+select count(distinct(business_id)) from businesses
+        where name like '%STARBUCK%';
+        
+ 
+# So there are 71 Starbucks in the area. The 327 violations are spread over them. 
+# But how many per each 
+
+select name, businesses.business_id, count(violationid) from 
+        businesses, violations where name like '%STARBUCK%' and 
+        businesses.business_id = violations.business_id group by 
+        businesses.business_id order by count(violationid) desc limit 10;
+        
+ # Dates
+
+# We can use SQL to extract query and data between given date ranges. We need to use a helper # function that tells SQLite that we are processing a true date as opposed to a mere character # string. 
+
+# Let's determine how many inspections took place between March 27, 2014 and April 10, 2014 ? 
+
+select count(*) from inspections where strftime(date) > 
+        strftime('20140327') and strftime(date) < strftime('20140410');
+        
+
+# Frequently we have missing values in data. It might be blank or have something like "NA". We
+# have to be on the lookout for this.
+
+select avg(score) from inspections limit 5;
+51.1987736955247
+
+# If we filter out the NAs, the result is different
+select avg(score) from inspections where score not like '%NA%';     
+
+# Get the average score per zip code
+select postal_code, avg(score) as mean from businesses, 
+        inspections where businesses.business_id = inspections.business_id 
+        and score not like '%NA%' group by postal_code order by mean 
+        asc limit 5;   
+  
+# How would we handle this using DBI ? Easy
+
+library(DBI)
+con <- dbConnect(RSQLite::SQLite(),dbname="restaurants.db")
+
+dbListTables(con)
+
+(res <- dbGetQuery(con, "select postal_code, avg(score) as mean from 
+                         businesses,inspections where 
+                         businesses.business_id = inspections.business_id 
+                         and score not like'%NA%'group by postal_code 
+                         order by mean asc limit 5"))
+                         
+  
+# Do You Really Need SQL ? 
+
+# If you have a n SQLite database such as restaurants.db you can work with it using 
+# dplyr commands !
+
+library(dplyr)
+
+mydb <- src_sqlite(path="restaurants.db")
+
+bus <- tbl(mydb,"businesses")
+ins <- tbl(mydb,"inspections")
+vio <- tbl(mydb,"violations")
+
+# So we can join the inspections with the business ids to find out who some of the worst
+# restaurants are in terms of score
+
+
+head(ins)
+head(bus)
+
+inner_join(ins,bus) %>% 
+     arrange(score) %>% 
+     head(15) %>% 
+     select(score,name,address)
+     
+ 
+#So we can join the violations and business tables to see the breakdown of violations across all # Starbucks shops
+
+inner_join(vio,bus) %>% filter(name=="STARBUCKS COFFEE") %>% 
+                        group_by(business_id) %>% 
+                        summarize(count=n(violationid)) %>% arrange(desc(count))
