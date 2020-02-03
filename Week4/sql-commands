@@ -1,4 +1,4 @@
-https://raw.githubusercontent.com/pittardsp/info550_spring_2018/master/SUPPORT/iris.csv
+https://raw.githubusercontent.com/steviep42/info550_spring_2020/master/Week4/support/iris.csv
 
 sqlite3 iris.db 
 
